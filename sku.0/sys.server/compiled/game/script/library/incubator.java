@@ -1,5 +1,7 @@
 package script.library;
 
+import java.util.Map;
+
 import script.dictionary;
 import script.obj_id;
 import script.prose_package;
@@ -2460,7 +2462,7 @@ public class incubator extends script.base_script
         pp = prose.setTT(pp, attributes[index]);
         pp = prose.setStringId(pp, SID_ATTRIBUTE_MUTATION);
         sendSystemMessageProse(player, pp);
-        CustomerServiceLog("incubatorMutationLog: ", "Player '" + getPlayerName(player) + "' (" + player + ") received a Type 1 mutation. This type of mutation gives a bonuse to stats. They received " + bonusAmt + " points to " + attributes[index] + ".");
+        CustomerServiceLog("incubatorMutationLog: ", "Player '" + getPlayerName(player) + "' (" + player + ") received a Type 1 mutation. This type of mutation gives a bonus to stats. They received " + bonusAmt + " points to " + attributes[index] + ".");
         return true;
     }
     public static String getCreatureTypeFromHashTemplate(obj_id station) throws InterruptedException
@@ -2681,7 +2683,7 @@ public class incubator extends script.base_script
         }
         return false;
     }
-    public static boolean giveMutationSkillBonus(obj_id station, obj_id player, int[] skillArray, String newTemplate) throws InterruptedException
+    public static boolean giveMutationSkillBonus(obj_id station, obj_id player, Map<String, Integer> attributeUpdates, String newTemplate) throws InterruptedException
     {
         blog("INCUBATOR_SKILLS", "giveMutationSkillBonus::start");
         if (!exists(station) || !isIdValid(station))
@@ -2692,15 +2694,12 @@ public class incubator extends script.base_script
         {
             return false;
         }
-        if (skillArray.length <= 0)
-        {
-            return false;
+
+        for (String key : attributeUpdates.keySet()) {
+            Integer result = attributeUpdates.merge(key, MUTATION_SKILL_BONUS_AMT, Integer::sum);
+            blog("INCUBATOR_SKILLS", "giveMutationSkillBonus::" + key + " - " + result);
         }
-        for (int i = 0; i < skillArray.length; ++i)
-        {
-            skillArray[i] += MUTATION_SKILL_BONUS_AMT;
-            blog("INCUBATOR_SKILLS", "giveMutationSkillBonus::skillArray[i]" + skillArray[i]);
-        }
+
         CustomerServiceLog("incubatorMutationLog: ", "Player '" + getPlayerName(player) + "' (" + player + ") received a template mutation. This type of mutation gives a bonus of " + MUTATION_SKILL_BONUS_AMT + " to all skills and a template appearance change. They now have the template of " + newTemplate + " in their incubator.");
         return true;
     }
